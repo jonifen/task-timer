@@ -15,11 +15,8 @@ export function HistoryPage() {
 
   useEffect(() => {
     if (!yyyy || !mm || !dd) return;
-    const date = `${yyyy}-${mm}-${dd}`;
-    if (date !== currentDate) {
-      navigateToDate(date);
-    }
-  }, [yyyy, mm, dd, currentDate, navigateToDate]);
+    navigateToDate(`${yyyy}-${mm}-${dd}`);
+  }, [yyyy, mm, dd, navigateToDate]);
 
   return (
     <main>

@@ -1,9 +1,12 @@
-import { BrowserRouter, Navigate, Route, Routes as RouterRoutes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes as RouterRoutes, useLocation, useNavigate } from "react-router-dom";
 
 import { Header } from "./components/header/header";
 import { HomePage } from "./pages/home";
 import { TimersPage } from "./pages/timers";
 import { HistoryPage } from "./pages/history";
+
+const VISITED_KEY = "hasVisited";
 
 const todayPath = (): string => {
   const now = new Date();
@@ -13,9 +16,26 @@ const todayPath = (): string => {
   return `/history/${yyyy}/${mm}/${dd}`;
 };
 
+function InitialRedirect() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+    if (localStorage.getItem(VISITED_KEY)) {
+      navigate(todayPath(), { replace: true });
+    } else {
+      localStorage.setItem(VISITED_KEY, "true");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
+}
+
 export function Routes() {
   return (
     <BrowserRouter>
+      <InitialRedirect />
       <Header />
       <RouterRoutes>
         <Route path="/" element={<HomePage />} />

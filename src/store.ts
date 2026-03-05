@@ -92,9 +92,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   navigateToDate: async (date) => {
     const state = get();
-    // Save current date's data before switching
-    await saveCurrentDate(state);
-    // Load new date's data
+    // Only save current date's data when actually switching dates — skipping
+    // the save on a same-date call (e.g. page refresh) prevents overwriting
+    // IndexedDB with the store's empty initial state.
+    if (date !== state.currentDate) {
+      await saveCurrentDate(state);
+    }
     const history = await db.dailyHistory.get(date);
     set({ currentDate: date, timerEntries: history?.entries ?? [] });
   },
