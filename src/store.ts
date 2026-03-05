@@ -1,0 +1,142 @@
+import { create } from "zustand";
+
+import { db } from "./db";
+
+export interface TimerConfig {
+  id: string;
+  name: string;
+  color?: string;
+}
+
+export type TimerStatus = "active" | "paused" | "completed";
+
+export interface TimerEntry {
+  id: string;
+  configId: string;
+  name: string;
+  startedAt: number;
+  pausedAt?: number;
+  completedAt?: number;
+  elapsedMs: number;
+  status: TimerStatus;
+}
+
+export interface DailyHistory {
+  date: string;
+  entries: TimerEntry[];
+}
+
+interface AppState {
+  timerConfigs: TimerConfig[];
+  currentDate: string;
+  timerEntries: TimerEntry[];
+}
+
+interface AppActions {
+  // Timer config actions
+  loadTimerConfigs: () => Promise<void>;
+  addTimerConfig: (config: TimerConfig) => Promise<void>;
+  updateTimerConfig: (config: TimerConfig) => Promise<void>;
+  removeTimerConfig: (id: string) => Promise<void>;
+
+  // Date navigation
+  navigateToDate: (date: string) => Promise<void>;
+
+  // Timer entry actions
+  startTimerEntry: (entry: TimerEntry) => void;
+  resumeTimerEntry: (id: string) => void;
+  addTimerEntry: (entry: TimerEntry) => void;
+  updateTimerEntry: (id: string, updates: Partial<TimerEntry>) => void;
+}
+
+export type AppStore = AppState & AppActions;
+
+const todayString = (): string => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const saveCurrentDate = async (state: AppState): Promise<void> => {
+  await db.dailyHistory.set({ date: state.currentDate, entries: state.timerEntries });
+};
+
+export const useAppStore = create<AppStore>((set, get) => ({
+  timerConfigs: [],
+  currentDate: todayString(),
+  timerEntries: [],
+
+  loadTimerConfigs: async () => {
+    const configs = await db.timerConfigs.getAll();
+    set({ timerConfigs: configs });
+  },
+
+  addTimerConfig: async (config) => {
+    await db.timerConfigs.set(config);
+    set((state) => ({ timerConfigs: [...state.timerConfigs, config] }));
+  },
+
+  updateTimerConfig: async (config) => {
+    await db.timerConfigs.set(config);
+    set((state) => ({
+      timerConfigs: state.timerConfigs.map((c) => (c.id === config.id ? config : c)),
+    }));
+  },
+
+  removeTimerConfig: async (id) => {
+    await db.timerConfigs.remove(id);
+    set((state) => ({ timerConfigs: state.timerConfigs.filter((c) => c.id !== id) }));
+  },
+
+  navigateToDate: async (date) => {
+    const state = get();
+    // Save current date's data before switching
+    await saveCurrentDate(state);
+    // Load new date's data
+    const history = await db.dailyHistory.get(date);
+    set({ currentDate: date, timerEntries: history?.entries ?? [] });
+  },
+
+  startTimerEntry: (entry) => {
+    const now = Date.now();
+    set((state) => ({
+      timerEntries: [
+        ...state.timerEntries.map((e) =>
+          e.status === "active"
+            ? { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now }
+            : e
+        ),
+        entry,
+      ],
+    }));
+    const { currentDate, timerEntries } = get();
+    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+  },
+
+  resumeTimerEntry: (id) => {
+    const now = Date.now();
+    set((state) => ({
+      timerEntries: state.timerEntries.map((e) => {
+        if (e.id === id) return { ...e, status: "active" as const, startedAt: now };
+        if (e.status === "active") return { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now };
+        return e;
+      }),
+    }));
+    const { currentDate, timerEntries } = get();
+    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+  },
+
+  addTimerEntry: (entry) => {
+    set((state) => ({ timerEntries: [...state.timerEntries, entry] }));
+  },
+
+  updateTimerEntry: (id, updates) => {
+    set((state) => ({
+      timerEntries: state.timerEntries.map((e) => (e.id === id ? { ...e, ...updates } : e)),
+    }));
+    const { currentDate, timerEntries } = get();
+    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+  },
+}));

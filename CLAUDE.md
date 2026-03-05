@@ -1,0 +1,63 @@
+# Task Timer
+
+## Overview
+A progressive web app for tracking tasks with multiple timers that can be started, paused and completed, with times stored in the IndexedDB of the browser.
+
+**Stack:** TypeScript, React, Vanilla Extract CSS, React Router DOM, Zustand, Vite, Vitest, React Testing Library, localforage
+
+## Commands
+- `npm install` - install dependencies
+- `npm run dev` - start dev server (port 3008)
+- `npm test` - run tests
+- `npm run lint` - run ESLint
+
+## Code Style
+- Prefer async/await over promise `.then()` chains
+- Prefer named exports over default exports
+- Only use `const`/`let`, never `var`
+- Extract reusable UI-tied logic into custom hooks (e.g. `use-timer.ts`)
+- Extract non-UI business logic into utility functions
+- Keep logic in the component itself only if it is not reusable
+- Types and interfaces are defined close to where they are used, not in a centralised `src/types/` directory
+- Check before installing new dependencies
+
+## File Naming
+- All files use kebab-case (e.g. `task-timer.tsx`, `use-timer.ts`)
+- Component files use `.tsx`, utility and hook files use `.ts`
+- Test files are co-located with source files (e.g. `task-timer.test.tsx` sits alongside `task-timer.tsx`)
+- Style files are co-located with their component (e.g. `task-timer.css.ts` alongside `task-timer.tsx`)
+
+## Formatting
+Uses Prettier with the following preferences:
+- Double quotes (not single quotes)
+- Line length: 120 characters
+
+## Architecture
+- `src/routes.tsx` - Component that sets up the routes used by React Router DOM
+- `src/pages/` - Page components to align with routes defined
+- `src/components/` - All smaller components
+- `src/hooks/` - Shared custom hooks (created as needed)
+- `src/utils/` - Shared utility functions (created as needed)
+- `src/db/` - IndexedDB interaction layer using `localforage` under the hood. All IndexedDB access goes through here — no other files should import `localforage` directly
+
+## Pages & Routes
+- `/` - Home/landing page explaining how to use the app
+- `/timers` - List of reusable timers; create and manage timer configurations
+- `/history/:yyyy/:mm/:dd` - Daily view showing active and completed timers for a given date. Defaults to today but supports navigating to historic dates
+
+## State Management
+Uses Zustand for global state. The store holds:
+- The list of reusable timer configurations
+- The active/completed timer history for the currently viewed date only
+
+When the user navigates to a different date on the history page:
+1. The current date's data is saved to IndexedDB (via `src/db/`)
+2. The new date's data is loaded from IndexedDB into the Zustand store
+3. The page path updates to reflect the new date (e.g. `/history/2026/03/05`)
+
+## Styling
+Uses Vanilla Extract for styling:
+- Light and dark themes using Vanilla Extract's `createTheme` API
+- Styles are co-located with their component in a `.css.ts` file (e.g. `task-timer.css.ts` alongside `task-timer.tsx`)
+- Avoid sprinkles or recipes for now — keep styling simple
+
