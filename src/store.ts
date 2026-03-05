@@ -59,9 +59,6 @@ const todayString = (): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-const saveCurrentDate = async (state: AppState): Promise<void> => {
-  await db.dailyHistory.set({ date: state.currentDate, entries: state.timerEntries });
-};
 
 export const useAppStore = create<AppStore>((set, get) => ({
   timerConfigs: [],
@@ -91,13 +88,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   navigateToDate: async (date) => {
-    const state = get();
-    // Only save current date's data when actually switching dates — skipping
-    // the save on a same-date call (e.g. page refresh) prevents overwriting
-    // IndexedDB with the store's empty initial state.
-    if (date !== state.currentDate) {
-      await saveCurrentDate(state);
-    }
+    // No save here — every timer action (start/resume/pause/complete) already
+    // persists immediately, so saving the in-memory state on navigation would
+    // risk overwriting IndexedDB with the store's empty initial state on refresh.
     const history = await db.dailyHistory.get(date);
     set({ currentDate: date, timerEntries: history?.entries ?? [] });
   },
