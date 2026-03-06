@@ -3,7 +3,7 @@
 ## Overview
 A progressive web app for tracking tasks with multiple timers that can be started, paused and completed, with times stored in the IndexedDB of the browser.
 
-**Stack:** TypeScript, React 19, Vanilla Extract CSS, React Router DOM v7, Zustand v5, Vite 7, Vitest, React Testing Library, localforage, recharts
+**Stack:** TypeScript, React 19, Vanilla Extract CSS, React Router DOM v7, Zustand v5, Vite 7, Vitest, React Testing Library, localforage, recharts, vite-plugin-pwa
 
 ## Commands
 - `npm install` - install dependencies (**always use `--legacy-peer-deps`** — recharts and eslint-plugin-react both require it due to peer dep conflicts with the current eslint/react versions)
@@ -62,6 +62,19 @@ When the user navigates to a different date on the history page:
 **Single-timer rule:** Only one timer can be active at a time. `startTimerEntry` and `resumeTimerEntry` both pause any currently active timer atomically in the same `set()` call.
 
 **Quick timer entries:** `TimerEntry.configId` is optional. Quick timers have no `configId` and are managed directly by entry ID, bypassing `useTimer` (which is config-based).
+
+## PWA
+The app is a Progressive Web App configured via `vite-plugin-pwa` in `vite.config.ts`:
+- A Workbox service worker is generated at build time (`dist/sw.js`) and precaches all build assets (JS, CSS, HTML, SVG)
+- `registerType: "autoUpdate"` — the service worker updates silently in the background when a new build is deployed
+- Web app manifest (`dist/manifest.webmanifest`) enables "Add to Home Screen" and `display: standalone`
+- Icons live in `public/icon-192.svg` and `public/icon-512.svg`
+- After the first visit the app loads fully offline — this is the primary motivation for the Docker/nginx setup
+
+## Docker
+- `Dockerfile` — multi-stage build: `node:22-alpine` builds the app, `nginx:alpine` serves `dist/` as static files
+- `nginx.conf` — SPA routing fallback (`try_files $uri /index.html`), 1-year immutable cache for hashed assets
+- `docker-compose.yaml` — maps host port `38092` to container port `80`; run with `docker compose up --build`
 
 ## Styling
 Uses Vanilla Extract for styling:
