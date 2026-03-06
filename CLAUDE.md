@@ -48,6 +48,8 @@ Uses Prettier with the following preferences:
 
 On first visit, the app stays on `/`. Returning users are redirected to today's history page. This is handled by `InitialRedirect` in `src/routes.tsx` using a `localStorage.hasVisited` flag.
 
+The header also contains a pop-out button (↗ icon) that opens the current page in a toolbar-free popup window via `window.open`, for a cleaner focused view.
+
 ## State Management
 Uses Zustand for global state. The store holds:
 - The list of reusable timer configurations

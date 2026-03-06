@@ -53,3 +53,24 @@ export const navLinkActive = style({
     backgroundColor: vars.color.surfaceHover,
   },
 });
+
+export const popOutButton = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "32px",
+  height: "32px",
+  marginLeft: vars.space["2"],
+  borderRadius: vars.radii.md,
+  border: "none",
+  backgroundColor: "transparent",
+  color: vars.color.textMuted,
+  cursor: "pointer",
+  flexShrink: 0,
+  transition: `color ${vars.transitions.fast}, background-color ${vars.transitions.fast}`,
+
+  ":hover": {
+    color: vars.color.textPrimary,
+    backgroundColor: vars.color.surfaceHover,
+  },
+});

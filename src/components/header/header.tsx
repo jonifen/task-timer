@@ -9,6 +9,10 @@ const NAV_LINKS = [
   { to: "/analytics", label: "Analytics", end: false },
 ] as const;
 
+function handlePopOut() {
+  window.open(window.location.href, "_blank", "toolbar=no,location=no,menubar=no,scrollbars=yes,resizable=yes,width=1280,height=800");
+}
+
 export function Header() {
   return (
     <header className={styles.header}>
@@ -27,6 +31,11 @@ export function Header() {
           </NavLink>
         ))}
       </nav>
+      <button className={styles.popOutButton} onClick={handlePopOut} title="Open in new window" aria-label="Open in new window">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 1H1v12h12V8M8 1h5m0 0v5m0-5L6 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
     </header>
   );
 }
