@@ -20,11 +20,24 @@ export const colorDot = style({
   backgroundColor: vars.color.border,
 });
 
-export const name = style({
+export const nameGroup = style({
   flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  gap: vars.space["1"],
+  minWidth: 0,
+});
+
+export const name = style({
   fontSize: vars.fontSizes.md,
   fontWeight: vars.fontWeights.medium,
   color: vars.color.textPrimary,
+});
+
+export const dailyTotal = style({
+  fontSize: vars.fontSizes.xs,
+  color: vars.color.textMuted,
+  fontFamily: "ui-monospace, monospace",
 });
 
 export const timerSection = style({

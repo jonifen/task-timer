@@ -12,7 +12,7 @@ export type TimerStatus = "active" | "paused" | "completed";
 
 export interface TimerEntry {
   id: string;
-  configId: string;
+  configId?: string;
   name: string;
   startedAt: number;
   pausedAt?: number;
@@ -47,6 +47,7 @@ interface AppActions {
   resumeTimerEntry: (id: string) => void;
   addTimerEntry: (entry: TimerEntry) => void;
   updateTimerEntry: (id: string, updates: Partial<TimerEntry>) => void;
+  stopAllTimerEntries: () => void;
 }
 
 export type AppStore = AppState & AppActions;
@@ -58,7 +59,6 @@ const todayString = (): string => {
   const dd = String(now.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 };
-
 
 export const useAppStore = create<AppStore>((set, get) => ({
   timerConfigs: [],
@@ -131,6 +131,21 @@ export const useAppStore = create<AppStore>((set, get) => ({
   updateTimerEntry: (id, updates) => {
     set((state) => ({
       timerEntries: state.timerEntries.map((e) => (e.id === id ? { ...e, ...updates } : e)),
+    }));
+    const { currentDate, timerEntries } = get();
+    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+  },
+
+  stopAllTimerEntries: () => {
+    const now = Date.now();
+    set((state) => ({
+      timerEntries: state.timerEntries.map((e) => {
+        if (e.status === "active")
+          return { ...e, status: "completed" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), completedAt: now };
+        if (e.status === "paused")
+          return { ...e, status: "completed" as const, completedAt: now };
+        return e;
+      }),
     }));
     const { currentDate, timerEntries } = get();
     db.dailyHistory.set({ date: currentDate, entries: timerEntries });

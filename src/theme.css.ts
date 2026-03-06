@@ -71,6 +71,8 @@ const sharedTokens = {
 export const [lightTheme, vars] = createTheme({
   color: {
     background: colors.white,
+    gradientFrom: "#eef2ff",
+    gradientTo: colors.grey50,
     surface: colors.grey50,
     surfaceHover: colors.grey100,
     border: colors.grey200,
@@ -94,6 +96,8 @@ export const [lightTheme, vars] = createTheme({
 export const darkTheme = createTheme(vars, {
   color: {
     background: colors.grey900,
+    gradientFrom: "#0d1117",
+    gradientTo: colors.grey900,
     surface: colors.grey800,
     surfaceHover: colors.grey700,
     border: colors.grey700,

@@ -23,24 +23,52 @@ export const heading = style({
   color: vars.color.textPrimary,
 });
 
-export const addButton = style({
+export const headerActions = style({
+  display: "flex",
+  alignItems: "center",
+  gap: vars.space["2"],
+});
+
+const baseButton = style({
   display: "flex",
   alignItems: "center",
   gap: vars.space["2"],
   padding: `${vars.space["2"]} ${vars.space["4"]}`,
-  backgroundColor: vars.color.accent,
-  color: vars.color.accentText,
   border: "none",
   borderRadius: vars.radii.md,
   fontSize: vars.fontSizes.sm,
   fontWeight: vars.fontWeights.medium,
   cursor: "pointer",
-  transition: `background-color ${vars.transitions.fast}`,
-
-  ":hover": {
-    backgroundColor: vars.color.accentHover,
-  },
+  transition: `background-color ${vars.transitions.fast}, opacity ${vars.transitions.fast}`,
 });
+
+export const addButton = style([
+  baseButton,
+  {
+    backgroundColor: vars.color.accent,
+    color: vars.color.accentText,
+    ":hover": { backgroundColor: vars.color.accentHover },
+  },
+]);
+
+export const quickButton = style([
+  baseButton,
+  {
+    backgroundColor: vars.color.surface,
+    color: vars.color.textPrimary,
+    border: `1px solid ${vars.color.border}`,
+    ":hover": { backgroundColor: vars.color.surfaceHover },
+  },
+]);
+
+export const stopAllButton = style([
+  baseButton,
+  {
+    backgroundColor: vars.color.danger,
+    color: vars.color.accentText,
+    ":hover": { opacity: 0.85 },
+  },
+]);
 
 export const list = style({
   display: "flex",

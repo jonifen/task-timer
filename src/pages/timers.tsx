@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { QuickTimerCard } from "../components/quick-timer-card/quick-timer-card";
 import { TimerConfigCard } from "../components/timer-config-card/timer-config-card";
 import { TimerConfigForm } from "../components/timer-config-form/timer-config-form";
 import { useAppStore } from "../store";
@@ -8,12 +9,18 @@ import * as styles from "./timers.css";
 
 export function TimersPage() {
   const timerConfigs = useAppStore((s) => s.timerConfigs);
+  const timerEntries = useAppStore((s) => s.timerEntries);
   const addTimerConfig = useAppStore((s) => s.addTimerConfig);
   const updateTimerConfig = useAppStore((s) => s.updateTimerConfig);
   const removeTimerConfig = useAppStore((s) => s.removeTimerConfig);
+  const startTimerEntry = useAppStore((s) => s.startTimerEntry);
+  const stopAllTimerEntries = useAppStore((s) => s.stopAllTimerEntries);
 
   const [addingNew, setAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [quickTimerId, setQuickTimerId] = useState<string | null>(null);
+
+  const hasRunningTimers = timerEntries.some((e) => e.status === "active" || e.status === "paused");
 
   function handleAdd(values: { name: string; color: string | undefined }) {
     addTimerConfig({ id: crypto.randomUUID(), name: values.name, color: values.color });
@@ -40,16 +47,38 @@ export function TimersPage() {
     setEditingId(id);
   }
 
+  function handleQuickTimer() {
+    const id = crypto.randomUUID();
+    startTimerEntry({ id, name: "Quick timer", startedAt: Date.now(), elapsedMs: 0, status: "active" });
+    setQuickTimerId(id);
+  }
+
   return (
     <main className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.heading}>Timers</h1>
-        {!addingNew && (
-          <button className={styles.addButton} onClick={handleStartAdding}>
-            + New timer
-          </button>
-        )}
+        <div className={styles.headerActions}>
+          {hasRunningTimers && (
+            <button className={styles.stopAllButton} onClick={stopAllTimerEntries}>
+              ■ Stop all
+            </button>
+          )}
+          {!quickTimerId && (
+            <button className={styles.quickButton} onClick={handleQuickTimer}>
+              ⚡ Quick timer
+            </button>
+          )}
+          {!addingNew && (
+            <button className={styles.addButton} onClick={handleStartAdding}>
+              + New timer
+            </button>
+          )}
+        </div>
       </div>
+
+      {quickTimerId && (
+        <QuickTimerCard entryId={quickTimerId} onDismiss={() => setQuickTimerId(null)} />
+      )}
 
       <div className={styles.list}>
         {timerConfigs.length === 0 && !addingNew && (

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { lightTheme, darkTheme } from "./theme.css";
 import { Routes } from "./routes";
 import { useAppStore } from "./store";
+import * as styles from "./app.css";
 
 export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -22,7 +23,7 @@ export function App() {
   }, [loadTimerConfigs]);
 
   return (
-    <div className={theme === "dark" ? darkTheme : lightTheme}>
+    <div className={`${theme === "dark" ? darkTheme : lightTheme} ${styles.root}`}>
       <Routes />
     </div>
   );

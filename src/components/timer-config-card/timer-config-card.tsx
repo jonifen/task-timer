@@ -1,6 +1,6 @@
 import { useTimer } from "../../hooks/use-timer";
 import { formatDuration } from "../../utils/format-duration";
-import type { TimerConfig } from "../../store";
+import { useAppStore, type TimerConfig } from "../../store";
 
 import * as styles from "./timer-config-card.css";
 
@@ -12,10 +12,16 @@ interface Props {
 
 export function TimerConfigCard({ config, onEdit, onDelete }: Props) {
   const { status, displayedElapsed, start, pause, resume, complete } = useTimer(config.id, config.name);
+  const completedMs = useAppStore((s) =>
+    s.timerEntries
+      .filter((e) => e.configId === config.id && e.status === "completed")
+      .reduce((sum, e) => sum + e.elapsedMs, 0)
+  );
 
   const isIdle = status === null;
   const isActive = status === "active";
   const isPaused = status === "paused";
+  const dailyTotal = completedMs + displayedElapsed;
 
   return (
     <div className={styles.card}>
@@ -24,7 +30,12 @@ export function TimerConfigCard({ config, onEdit, onDelete }: Props) {
         style={config.color ? { backgroundColor: config.color } : undefined}
         aria-hidden
       />
-      <span className={styles.name}>{config.name}</span>
+      <div className={styles.nameGroup}>
+        <span className={styles.name}>{config.name}</span>
+        {dailyTotal > 0 && (
+          <span className={styles.dailyTotal}>Today: {formatDuration(dailyTotal)}</span>
+        )}
+      </div>
 
       <div className={styles.timerSection}>
         {!isIdle && (
