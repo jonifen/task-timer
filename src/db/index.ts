@@ -39,5 +39,21 @@ export const db = {
     async set(history: DailyHistory): Promise<void> {
       await dailyHistoryStore.setItem(history.date, history);
     },
+
+    async getRange(startDate: string, endDate: string): Promise<DailyHistory[]> {
+      const results: DailyHistory[] = [];
+      await dailyHistoryStore.iterate<DailyHistory, void>((value) => {
+        if (value.date >= startDate && value.date <= endDate) results.push(value);
+      });
+      return results.sort((a, b) => a.date.localeCompare(b.date));
+    },
+
+    async getAll(): Promise<DailyHistory[]> {
+      const results: DailyHistory[] = [];
+      await dailyHistoryStore.iterate<DailyHistory, void>((value) => {
+        results.push(value);
+      });
+      return results.sort((a, b) => a.date.localeCompare(b.date));
+    },
   },
 };

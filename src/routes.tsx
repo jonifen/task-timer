@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes as RouterRoutes, useLocation, useNavigate } from "react-router-dom";
 
 import { Header } from "./components/header/header";
+import { AnalyticsPage } from "./pages/analytics";
 import { HomePage } from "./pages/home";
 import { TimersPage } from "./pages/timers";
 import { HistoryPage } from "./pages/history";
@@ -42,6 +43,7 @@ export function Routes() {
         <Route path="/timers" element={<TimersPage />} />
         <Route path="/history/:yyyy/:mm/:dd" element={<HistoryPage />} />
         <Route path="/history" element={<Navigate to={todayPath()} replace />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </RouterRoutes>
     </BrowserRouter>
   );

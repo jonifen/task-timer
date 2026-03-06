@@ -3,10 +3,10 @@
 ## Overview
 A progressive web app for tracking tasks with multiple timers that can be started, paused and completed, with times stored in the IndexedDB of the browser.
 
-**Stack:** TypeScript, React 19, Vanilla Extract CSS, React Router DOM v7, Zustand v5, Vite 7, Vitest, React Testing Library, localforage
+**Stack:** TypeScript, React 19, Vanilla Extract CSS, React Router DOM v7, Zustand v5, Vite 7, Vitest, React Testing Library, localforage, recharts
 
 ## Commands
-- `npm install` - install dependencies (use `--legacy-peer-deps` if peer dep conflicts arise, e.g. `eslint-plugin-react` with eslint v10)
+- `npm install` - install dependencies (**always use `--legacy-peer-deps`** — recharts and eslint-plugin-react both require it due to peer dep conflicts with the current eslint/react versions)
 - `npm run dev` - start dev server (port 3008)
 - `npm test` - run tests
 - `npm run lint` - run ESLint
@@ -38,12 +38,13 @@ Uses Prettier with the following preferences:
 - `src/components/` - All smaller components
 - `src/hooks/` - Shared custom hooks (created as needed)
 - `src/utils/` - Shared utility functions (created as needed)
-- `src/db/` - IndexedDB interaction layer using `localforage` under the hood. All IndexedDB access goes through here — no other files should import `localforage` directly
+- `src/db/` - IndexedDB interaction layer using `localforage` under the hood. All IndexedDB access goes through here — no other files should import `localforage` directly. Exposes `db.timerConfigs` (getAll/set/remove) and `db.dailyHistory` (get/set/getRange/getAll)
 
 ## Pages & Routes
 - `/` - Home/landing page explaining how to use the app
 - `/timers` - List of reusable timers; create and manage timer configurations. Includes a "Quick timer" button that starts an unnamed timer immediately (no config created) and prompts the user to name it inline. Saves to history only.
 - `/history/:yyyy/:mm/:dd` - Daily view showing active and completed timers for a given date. Defaults to today but supports navigating to historic dates
+- `/analytics` - Date range analytics: preset or custom date picker, summary stats (total time, active days, most-used timer), stacked bar chart of daily breakdown by timer, and a donut chart of total time per timer. Reads directly from IndexedDB via `db.dailyHistory.getRange` — does not use Zustand store. Includes an "Export JSON" button that dumps all timer configs and all daily history to a dated `.json` file via `src/utils/export-data.ts`.
 
 On first visit, the app stays on `/`. Returning users are redirected to today's history page. This is handled by `InitialRedirect` in `src/routes.tsx` using a `localStorage.hasVisited` flag.
 

@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/timers", label: "Timers", end: false },
   { to: "/history", label: "History", end: false },
+  { to: "/analytics", label: "Analytics", end: false },
 ] as const;
 
 export function Header() {
