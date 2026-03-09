@@ -28,9 +28,18 @@ export const nav = style({
   display: "flex",
   alignItems: "center",
   gap: vars.space["2"],
+
+  "@media": {
+    "screen and (max-width: 767px)": {
+      gap: vars.space["1"],
+    },
+  },
 });
 
 export const navLink = style({
+  display: "flex",
+  alignItems: "center",
+  gap: vars.space["2"],
   padding: `${vars.space["2"]} ${vars.space["3"]}`,
   borderRadius: vars.radii.md,
   fontSize: vars.fontSizes.sm,
@@ -42,6 +51,19 @@ export const navLink = style({
   ":hover": {
     color: vars.color.textPrimary,
     backgroundColor: vars.color.surfaceHover,
+  },
+});
+
+export const navIcon = style({
+  display: "flex",
+  flexShrink: 0,
+});
+
+export const navLabel = style({
+  "@media": {
+    "screen and (max-width: 767px)": {
+      display: "none",
+    },
   },
 });
 
