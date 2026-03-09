@@ -176,6 +176,7 @@ export function AnalyticsPage() {
                   <Tooltip
                     formatter={(value, _key, { name }) => [formatDurationHuman(Number(value)), name]}
                     contentStyle={{ fontSize: 13 }}
+                    wrapperStyle={{ zIndex: 100 }}
                   />
                   <Legend wrapperStyle={{ fontSize: 13 }} />
                   {data.timerStats.map((stat) => (
@@ -189,7 +190,7 @@ export function AnalyticsPage() {
           <section className={styles.chartSection}>
             <h2 className={styles.chartHeading}>Time by timer</h2>
             <div className={styles.pieWrap}>
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={340}>
                 <PieChart>
                   <Pie
                     data={data.timerStats.map((s) => ({ name: s.name, value: s.totalMs, key: s.key }))}
@@ -205,7 +206,7 @@ export function AnalyticsPage() {
                       <Cell key={stat.key} fill={stat.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => formatDurationHuman(Number(value))} contentStyle={{ fontSize: 13 }} />
+                  <Tooltip formatter={(value) => formatDurationHuman(Number(value))} contentStyle={{ fontSize: 13 }} wrapperStyle={{ zIndex: 100 }} />
                   <Legend
                     formatter={(value, entry) => {
                       const ms = (entry.payload as { value: number }).value;

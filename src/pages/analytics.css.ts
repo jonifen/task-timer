@@ -174,6 +174,9 @@ export const chartSection = style({
   backgroundColor: vars.color.surface,
   border: `1px solid ${vars.color.border}`,
   borderRadius: vars.radii.lg,
+  overflow: "visible",
+  position: "relative",
+  zIndex: 0,
 });
 
 export const chartHeading = style({
@@ -184,8 +187,10 @@ export const chartHeading = style({
 
 export const chartWrap = style({
   color: vars.color.textMuted,
+  overflow: "visible",
 });
 
 export const pieWrap = style({
   color: vars.color.textMuted,
+  overflow: "visible",
 });
