@@ -158,7 +158,7 @@ export function AnalyticsPage() {
             </div>
           </section>
 
-          <section className={styles.chartSection}>
+          <section className={styles.chartSection} style={{ zIndex: 1 }}>
             <h2 className={styles.chartHeading}>Daily breakdown</h2>
             <div className={styles.chartWrap}>
               <ResponsiveContainer width="100%" height={280}>
