@@ -42,7 +42,7 @@ Uses Prettier with the following preferences:
 
 ## Pages & Routes
 - `/` - Home/landing page explaining how to use the app
-- `/timers` - List of reusable timers; create and manage timer configurations. Includes a "Quick timer" button that starts an unnamed timer immediately (no config created) and prompts the user to name it inline. Saves to history only.
+- `/timers` - List of reusable timers; create and manage timer configurations. Timers are sorted by most recently used (`TimerConfig.lastUsedAt`), updated on every start. Includes a "Quick timer" button that starts an unnamed timer immediately (no config created) and prompts the user to name it inline. Saves to history only. Also loads today's entries on mount so daily totals and the quick timer card are available even when arriving at `/timers` directly (e.g. after a refresh).
 - `/history/:yyyy/:mm/:dd` - Daily view showing active and completed timers for a given date. Defaults to today but supports navigating to historic dates
 - `/analytics` - Date range analytics: preset or custom date picker, summary stats (total time, active days, most-used timer), stacked bar chart of daily breakdown by timer, and a donut chart of total time per timer. Reads directly from IndexedDB via `db.dailyHistory.getRange` — does not use Zustand store. Includes an "Export JSON" button that dumps all timer configs and all daily history to a dated `.json` file via `src/utils/export-data.ts`.
 
@@ -63,7 +63,9 @@ When the user navigates to a different date on the history page:
 
 **Single-timer rule:** Only one timer can be active at a time. `startTimerEntry` and `resumeTimerEntry` both pause any currently active timer atomically in the same `set()` call.
 
-**Quick timer entries:** `TimerEntry.configId` is optional. Quick timers have no `configId` and are managed directly by entry ID, bypassing `useTimer` (which is config-based).
+**Quick timer entries:** `TimerEntry.configId` is optional. Quick timers have no `configId` and are managed directly by entry ID, bypassing `useTimer` (which is config-based). The active/paused quick timer entry is derived directly from the store in `TimersPage` (not local state), so `QuickTimerCard` reappears automatically after a page refresh. The name input is restored from `entry.name` on remount, treating `"Quick timer"` as the unnamed default.
+
+**`TimerConfig.lastUsedAt`:** Optional timestamp set by `startTimerEntry` whenever a reusable timer is started. Persisted to IndexedDB immediately. Used to sort the timers list by most recently used.
 
 ## PWA
 The app is a Progressive Web App configured via `vite-plugin-pwa` in `vite.config.ts`:

@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { to: "/timers", label: "Timers", end: false },
   { to: "/history", label: "History", end: false },
   { to: "/analytics", label: "Analytics", end: false },
+  { to: "/settings", label: "Settings", end: false },
 ] as const;
 
 function handlePopOut() {

@@ -16,8 +16,6 @@ import {
 import { db } from "../db";
 import { formatDurationHuman } from "../utils/format-duration";
 import { buildDateRange, processAnalyticsData, type AnalyticsData } from "../utils/analytics";
-import { exportData } from "../utils/export-data";
-
 import * as styles from "./analytics.css";
 
 const todayStr = (): string => {
@@ -57,7 +55,6 @@ export function AnalyticsPage() {
   const [endDate, setEndDate] = useState(today);
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
 
   const allDates = useMemo(() => buildDateRange(startDate, endDate), [startDate, endDate]);
 
@@ -69,12 +66,6 @@ export function AnalyticsPage() {
       setLoading(false);
     });
   }, [startDate, endDate, allDates]);
-
-  async function handleExport() {
-    setExporting(true);
-    await exportData();
-    setExporting(false);
-  }
 
   function applyPreset(days: number) {
     const end = today;
@@ -90,9 +81,6 @@ export function AnalyticsPage() {
     <main className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.heading}>Analytics</h1>
-        <button className={styles.exportButton} onClick={handleExport} disabled={exporting}>
-          {exporting ? "Exporting…" : "Export JSON"}
-        </button>
       </div>
 
       <section className={styles.controls}>

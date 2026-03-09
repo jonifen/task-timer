@@ -11,10 +11,22 @@ export const page = style({
   gap: vars.space["6"],
 });
 
+export const headingRow = style({
+  display: "flex",
+  alignItems: "baseline",
+  gap: vars.space["3"],
+});
+
 export const heading = style({
   fontSize: vars.fontSizes["2xl"],
   fontWeight: vars.fontWeights.bold,
   color: vars.color.textPrimary,
+});
+
+export const dailyTotal = style({
+  fontSize: vars.fontSizes.md,
+  fontWeight: vars.fontWeights.medium,
+  color: vars.color.textMuted,
 });
 
 export const list = style({

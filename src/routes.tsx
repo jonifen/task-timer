@@ -3,7 +3,9 @@ import { BrowserRouter, Navigate, Route, Routes as RouterRoutes, useLocation, us
 
 import { Header } from "./components/header/header";
 import { AnalyticsPage } from "./pages/analytics";
+import { DataEditorPage } from "./pages/data-editor";
 import { HomePage } from "./pages/home";
+import { SettingsPage } from "./pages/settings";
 import { TimersPage } from "./pages/timers";
 import { HistoryPage } from "./pages/history";
 
@@ -44,6 +46,8 @@ export function Routes() {
         <Route path="/history/:yyyy/:mm/:dd" element={<HistoryPage />} />
         <Route path="/history" element={<Navigate to={todayPath()} replace />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/data-editor" element={<DataEditorPage />} />
       </RouterRoutes>
     </BrowserRouter>
   );

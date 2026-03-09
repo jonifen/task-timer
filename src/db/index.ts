@@ -29,6 +29,10 @@ export const db = {
     async remove(id: string): Promise<void> {
       await timerConfigsStore.removeItem(id);
     },
+
+    async clearAll(): Promise<void> {
+      await timerConfigsStore.clear();
+    },
   },
 
   dailyHistory: {
@@ -54,6 +58,14 @@ export const db = {
         results.push(value);
       });
       return results.sort((a, b) => a.date.localeCompare(b.date));
+    },
+
+    async remove(date: string): Promise<void> {
+      await dailyHistoryStore.removeItem(date);
+    },
+
+    async clearAll(): Promise<void> {
+      await dailyHistoryStore.clear();
     },
   },
 };
