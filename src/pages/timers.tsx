@@ -42,6 +42,8 @@ export function TimersPage() {
 
   const hasRunningTimers = timerEntries.some((e) => e.status === "active" || e.status === "paused");
 
+  const sortedConfigs = [...timerConfigs].sort((a, b) => (b.lastUsedAt ?? 0) - (a.lastUsedAt ?? 0));
+
   function handleAdd(values: { name: string; color: string | undefined }) {
     addTimerConfig({ id: crypto.randomUUID(), name: values.name, color: values.color });
     setAddingNew(false);
@@ -104,7 +106,7 @@ export function TimersPage() {
           <p className={styles.emptyState}>No timers yet. Create one to get started.</p>
         )}
 
-        {timerConfigs.map((config) =>
+        {sortedConfigs.map((config) =>
           editingId === config.id ? (
             <TimerConfigForm
               key={config.id}

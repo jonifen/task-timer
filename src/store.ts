@@ -6,6 +6,7 @@ export interface TimerConfig {
   id: string;
   name: string;
   color?: string;
+  lastUsedAt?: number;
 }
 
 export type TimerStatus = "active" | "paused" | "completed";
@@ -97,18 +98,28 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   startTimerEntry: (entry) => {
     const now = Date.now();
-    set((state) => ({
-      timerEntries: [
-        ...state.timerEntries.map((e) =>
-          e.status === "active"
-            ? { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now }
-            : e
-        ),
-        entry,
-      ],
-    }));
-    const { currentDate, timerEntries } = get();
+    set((state) => {
+      const updatedConfigs = entry.configId
+        ? state.timerConfigs.map((c) => (c.id === entry.configId ? { ...c, lastUsedAt: now } : c))
+        : state.timerConfigs;
+      return {
+        timerConfigs: updatedConfigs,
+        timerEntries: [
+          ...state.timerEntries.map((e) =>
+            e.status === "active"
+              ? { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now }
+              : e
+          ),
+          entry,
+        ],
+      };
+    });
+    const { currentDate, timerEntries, timerConfigs } = get();
     db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+    if (entry.configId) {
+      const config = timerConfigs.find((c) => c.id === entry.configId);
+      if (config) db.timerConfigs.set(config);
+    }
   },
 
   resumeTimerEntry: (id) => {
