@@ -21,7 +21,12 @@ export function QuickTimerCard({ entryId, onDismiss }: Props) {
   const updateTimerEntry = useAppStore((s) => s.updateTimerEntry);
   const resumeTimerEntry = useAppStore((s) => s.resumeTimerEntry);
 
-  const [name, setName] = useState("");
+  // Restore any previously saved name, but treat the default placeholder
+  // "Quick timer" as unnamed so new cards still show the empty prompt.
+  const [name, setName] = useState(() => {
+    const stored = entry?.name ?? "";
+    return stored === "Quick timer" ? "" : stored;
+  });
   const [elapsed, setElapsed] = useState(() => (entry ? computeElapsed(entry) : 0));
   const inputRef = useRef<HTMLInputElement>(null);
 

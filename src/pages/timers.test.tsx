@@ -21,6 +21,9 @@ function makeStore(overrides: Record<string, unknown> = {}) {
     removeTimerConfig: vi.fn(),
     addTimerEntry: vi.fn(),
     updateTimerEntry: vi.fn(),
+    navigateToDate: vi.fn(),
+    startTimerEntry: vi.fn(),
+    stopAllTimerEntries: vi.fn(),
     ...overrides,
   };
 }

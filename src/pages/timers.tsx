@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { QuickTimerCard } from "../components/quick-timer-card/quick-timer-card";
 import { TimerConfigCard } from "../components/timer-config-card/timer-config-card";
@@ -6,6 +6,14 @@ import { TimerConfigForm } from "../components/timer-config-form/timer-config-fo
 import { useAppStore } from "../store";
 
 import * as styles from "./timers.css";
+
+const todayStr = (): string => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 export function TimersPage() {
   const timerConfigs = useAppStore((s) => s.timerConfigs);
@@ -15,10 +23,22 @@ export function TimersPage() {
   const removeTimerConfig = useAppStore((s) => s.removeTimerConfig);
   const startTimerEntry = useAppStore((s) => s.startTimerEntry);
   const stopAllTimerEntries = useAppStore((s) => s.stopAllTimerEntries);
+  const navigateToDate = useAppStore((s) => s.navigateToDate);
+
+  // Derive the active/paused quick timer entry directly from the store so it
+  // survives a page refresh without needing to persist UI state.
+  const quickTimerId = useAppStore(
+    (s) => s.timerEntries.find((e) => !e.configId && (e.status === "active" || e.status === "paused"))?.id ?? null
+  );
 
   const [addingNew, setAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [quickTimerId, setQuickTimerId] = useState<string | null>(null);
+
+  // Load today's entries on mount so the quick timer and daily totals are
+  // available even when arriving directly at /timers (e.g. after a refresh).
+  useEffect(() => {
+    navigateToDate(todayStr());
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasRunningTimers = timerEntries.some((e) => e.status === "active" || e.status === "paused");
 
@@ -50,7 +70,6 @@ export function TimersPage() {
   function handleQuickTimer() {
     const id = crypto.randomUUID();
     startTimerEntry({ id, name: "Quick timer", startedAt: Date.now(), elapsedMs: 0, status: "active" });
-    setQuickTimerId(id);
   }
 
   return (
@@ -77,7 +96,7 @@ export function TimersPage() {
       </div>
 
       {quickTimerId && (
-        <QuickTimerCard entryId={quickTimerId} onDismiss={() => setQuickTimerId(null)} />
+        <QuickTimerCard entryId={quickTimerId} onDismiss={() => {}} />
       )}
 
       <div className={styles.list}>
