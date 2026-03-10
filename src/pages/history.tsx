@@ -32,8 +32,11 @@ export function HistoryPage() {
   }, [timerEntries]);
 
   useEffect(() => {
-    if (!yyyy || !mm || !dd) return;
-    navigateToDate(`${yyyy}-${mm}-${dd}`);
+    const date =
+      yyyy && mm && dd
+        ? `${yyyy}-${mm}-${dd}`
+        : new Date().toISOString().slice(0, 10);
+    navigateToDate(date);
   }, [yyyy, mm, dd, navigateToDate]);
 
   return (

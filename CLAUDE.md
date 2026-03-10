@@ -38,17 +38,19 @@ Uses Prettier with the following preferences:
 - `src/components/` - All smaller components
 - `src/hooks/` - Shared custom hooks (created as needed)
 - `src/utils/` - Shared utility functions (created as needed)
-- `src/db/` - IndexedDB interaction layer using `localforage` under the hood. All IndexedDB access goes through here — no other files should import `localforage` directly. Exposes `db.timerConfigs` (getAll/set/remove) and `db.dailyHistory` (get/set/getRange/getAll)
+- `src/db/` - IndexedDB interaction layer using `localforage` under the hood. All IndexedDB access goes through here — no other files should import `localforage` directly. Exposes `db.timerConfigs` (getAll/set/remove/clearAll) and `db.dailyHistory` (get/set/getRange/getAll/remove/clearAll)
 
 ## Pages & Routes
 - `/` - Home/landing page explaining how to use the app
 - `/timers` - List of reusable timers; create and manage timer configurations. Timers are sorted by most recently used (`TimerConfig.lastUsedAt`), updated on every start. Includes a "Quick timer" button that starts an unnamed timer immediately (no config created) and prompts the user to name it inline. Saves to history only. Also loads today's entries on mount so daily totals and the quick timer card are available even when arriving at `/timers` directly (e.g. after a refresh).
-- `/history/:yyyy/:mm/:dd` - Daily view showing active and completed timers for a given date. Defaults to today but supports navigating to historic dates
-- `/analytics` - Date range analytics: preset or custom date picker, summary stats (total time, active days, most-used timer), stacked bar chart of daily breakdown by timer, and a donut chart of total time per timer. Reads directly from IndexedDB via `db.dailyHistory.getRange` — does not use Zustand store. Includes an "Export JSON" button that dumps all timer configs and all daily history to a dated `.json` file via `src/utils/export-data.ts`.
+- `/history/:yyyy/:mm/:dd` - Daily view showing active and completed timers for a given date. Always defaults to today if no date params are present. Shows a live daily total beneath the date heading, ticking every second when an active timer is running.
+- `/analytics` - Date range analytics: preset or custom date picker, summary stats (total time, active days, most-used timer), stacked bar chart of daily breakdown by timer, and a donut chart of total time per timer. Reads directly from IndexedDB via `db.dailyHistory.getRange` — does not use Zustand store.
+- `/settings` - Settings page with two sections: "Import & Export" (export all data to JSON, import from a previously exported file with a confirmation warning) and "Developer tools" (link to the data editor).
+- `/settings/data-editor` - Browse and directly edit all IndexedDB records. Records are grouped into "Timer configurations" and "Daily history". Clicking a record opens an inline JSON textarea editor with Save, Cancel, and Delete (with confirmation) buttons.
 
 On first visit, the app stays on `/`. Returning users are redirected to today's history page. This is handled by `InitialRedirect` in `src/routes.tsx` using a `localStorage.hasVisited` flag.
 
-The header also contains a pop-out button (↗ icon) that opens the current page in a toolbar-free popup window via `window.open`, for a cleaner focused view.
+The header nav links include SVG icons at all screen widths. Below 768px the text labels are hidden and only icons are shown (with the label available as a `title` tooltip). The header also contains a pop-out button (↗ icon) that opens the current page in a toolbar-free popup window via `window.open`, for a cleaner focused view.
 
 ## State Management
 Uses Zustand for global state. The store holds:
