@@ -98,11 +98,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   startTimerEntry: (entry) => {
     const now = Date.now();
+    // Always save to today — using currentDate here would risk writing to a
+    // previously-viewed historic date if navigateToDate hasn't resolved yet.
+    const today = todayString();
     set((state) => {
       const updatedConfigs = entry.configId
         ? state.timerConfigs.map((c) => (c.id === entry.configId ? { ...c, lastUsedAt: now } : c))
         : state.timerConfigs;
       return {
+        currentDate: today,
         timerConfigs: updatedConfigs,
         timerEntries: [
           ...state.timerEntries.map((e) =>
@@ -114,8 +118,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         ],
       };
     });
-    const { currentDate, timerEntries, timerConfigs } = get();
-    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+    const { timerEntries, timerConfigs } = get();
+    db.dailyHistory.set({ date: today, entries: timerEntries });
     if (entry.configId) {
       const config = timerConfigs.find((c) => c.id === entry.configId);
       if (config) db.timerConfigs.set(config);
