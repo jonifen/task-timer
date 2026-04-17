@@ -9,14 +9,13 @@ export interface TimerConfig {
   lastUsedAt?: number;
 }
 
-export type TimerStatus = "active" | "paused" | "completed";
+export type TimerStatus = "active" | "completed";
 
 export interface TimerEntry {
   id: string;
   configId?: string;
   name: string;
   startedAt: number;
-  pausedAt?: number;
   completedAt?: number;
   elapsedMs: number;
   status: TimerStatus;
@@ -45,9 +44,9 @@ interface AppActions {
 
   // Timer entry actions
   startTimerEntry: (entry: TimerEntry) => void;
-  resumeTimerEntry: (id: string) => void;
   addTimerEntry: (entry: TimerEntry) => void;
   updateTimerEntry: (id: string, updates: Partial<TimerEntry>) => void;
+  removeTimerEntry: (id: string) => void;
   stopAllTimerEntries: () => void;
 }
 
@@ -89,11 +88,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   navigateToDate: async (date) => {
-    // No save here — every timer action (start/resume/pause/complete) already
-    // persists immediately, so saving the in-memory state on navigation would
-    // risk overwriting IndexedDB with the store's empty initial state on refresh.
+    // No save here — every timer action already persists immediately.
     const history = await db.dailyHistory.get(date);
-    set({ currentDate: date, timerEntries: history?.entries ?? [] });
+    // Migrate any legacy "paused" entries (from before pause was removed) to "completed".
+    const entries = (history?.entries ?? []).map((e) =>
+      (e.status as string) === "paused"
+        ? { ...e, status: "completed" as const, completedAt: (e as any).pausedAt ?? e.startedAt }
+        : e
+    );
+    set({ currentDate: date, timerEntries: entries });
   },
 
   startTimerEntry: (entry) => {
@@ -111,7 +114,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         timerEntries: [
           ...state.timerEntries.map((e) =>
             e.status === "active"
-              ? { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now }
+              ? { ...e, status: "completed" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), completedAt: now }
               : e
           ),
           entry,
@@ -126,19 +129,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  resumeTimerEntry: (id) => {
-    const now = Date.now();
-    set((state) => ({
-      timerEntries: state.timerEntries.map((e) => {
-        if (e.id === id) return { ...e, status: "active" as const, startedAt: now };
-        if (e.status === "active") return { ...e, status: "paused" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), pausedAt: now };
-        return e;
-      }),
-    }));
-    const { currentDate, timerEntries } = get();
-    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
-  },
-
   addTimerEntry: (entry) => {
     set((state) => ({ timerEntries: [...state.timerEntries, entry] }));
   },
@@ -151,16 +141,22 @@ export const useAppStore = create<AppStore>((set, get) => ({
     db.dailyHistory.set({ date: currentDate, entries: timerEntries });
   },
 
+  removeTimerEntry: (id) => {
+    set((state) => ({
+      timerEntries: state.timerEntries.filter((e) => e.id !== id),
+    }));
+    const { currentDate, timerEntries } = get();
+    db.dailyHistory.set({ date: currentDate, entries: timerEntries });
+  },
+
   stopAllTimerEntries: () => {
     const now = Date.now();
     set((state) => ({
-      timerEntries: state.timerEntries.map((e) => {
-        if (e.status === "active")
-          return { ...e, status: "completed" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), completedAt: now };
-        if (e.status === "paused")
-          return { ...e, status: "completed" as const, completedAt: now };
-        return e;
-      }),
+      timerEntries: state.timerEntries.map((e) =>
+        e.status === "active"
+          ? { ...e, status: "completed" as const, elapsedMs: e.elapsedMs + (now - e.startedAt), completedAt: now }
+          : e
+      ),
     }));
     const { currentDate, timerEntries } = get();
     db.dailyHistory.set({ date: currentDate, entries: timerEntries });

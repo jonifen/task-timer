@@ -74,12 +74,29 @@ export const statusIconActive = style({
   color: vars.color.timerActive,
 });
 
-export const statusIconPaused = style({
-  color: vars.color.timerPaused,
-});
-
 export const statusIconCompleted = style({
   color: vars.color.timerCompleted,
+});
+
+export const editButton = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "28px",
+  height: "28px",
+  borderRadius: vars.radii.md,
+  border: "none",
+  backgroundColor: "transparent",
+  color: vars.color.textMuted,
+  cursor: "pointer",
+  fontSize: vars.fontSizes.md,
+  flexShrink: 0,
+  transition: `background-color ${vars.transitions.fast}, color ${vars.transitions.fast}`,
+
+  ":hover": {
+    backgroundColor: vars.color.surfaceHover,
+    color: vars.color.textPrimary,
+  },
 });
 
 export const elapsed = style({

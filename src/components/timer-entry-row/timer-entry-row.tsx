@@ -8,6 +8,7 @@ import * as styles from "./timer-entry-row.css";
 
 interface Props {
   entry: TimerEntry;
+  onEdit?: () => void;
 }
 
 function computeElapsed(entry: TimerEntry): number {
@@ -17,17 +18,15 @@ function computeElapsed(entry: TimerEntry): number {
 
 const STATUS_ICON: Record<TimerEntry["status"], string> = {
   active: "▶",
-  paused: "⏸",
   completed: "✓",
 };
 
 const STATUS_ICON_CLASS: Record<TimerEntry["status"], string> = {
   active: styles.statusIconActive,
-  paused: styles.statusIconPaused,
   completed: styles.statusIconCompleted,
 };
 
-export function TimerEntryRow({ entry }: Props) {
+export function TimerEntryRow({ entry, onEdit }: Props) {
   const config = useAppStore((s) => s.timerConfigs.find((c) => c.id === entry.configId));
   const [elapsed, setElapsed] = useState(() => computeElapsed(entry));
 
@@ -66,6 +65,16 @@ export function TimerEntryRow({ entry }: Props) {
           {formatDuration(elapsed)}
         </span>
       </div>
+      {onEdit && (
+        <button
+          className={styles.editButton}
+          onClick={onEdit}
+          aria-label={`Edit ${entry.name}`}
+          title="Edit entry"
+        >
+          ✎
+        </button>
+      )}
     </div>
   );
 }

@@ -50,10 +50,6 @@ export const elapsed = style({
   textAlign: "right",
 });
 
-export const elapsedPaused = style({
-  color: vars.color.textMuted,
-});
-
 export const controls = style({
   display: "flex",
   gap: vars.space["2"],

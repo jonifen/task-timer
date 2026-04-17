@@ -11,13 +11,9 @@ function computeElapsed(entry: TimerEntry | null): number {
 
 export function useTimer(configId: string, name: string) {
   const entry = useAppStore(
-    (s) =>
-      s.timerEntries.find(
-        (e) => e.configId === configId && (e.status === "active" || e.status === "paused")
-      ) ?? null
+    (s) => s.timerEntries.find((e) => e.configId === configId && e.status === "active") ?? null
   );
   const startTimerEntry = useAppStore((s) => s.startTimerEntry);
-  const resumeTimerEntry = useAppStore((s) => s.resumeTimerEntry);
   const updateTimerEntry = useAppStore((s) => s.updateTimerEntry);
 
   const [displayedElapsed, setDisplayedElapsed] = useState(() => computeElapsed(entry));
@@ -41,21 +37,6 @@ export function useTimer(configId: string, name: string) {
     });
   }
 
-  function pause() {
-    if (!entry || entry.status !== "active") return;
-    const now = Date.now();
-    updateTimerEntry(entry.id, {
-      elapsedMs: entry.elapsedMs + (now - entry.startedAt),
-      pausedAt: now,
-      status: "paused",
-    });
-  }
-
-  function resume() {
-    if (!entry || entry.status !== "paused") return;
-    resumeTimerEntry(entry.id);
-  }
-
   function complete() {
     if (!entry) return;
     updateTimerEntry(entry.id, {
@@ -69,8 +50,6 @@ export function useTimer(configId: string, name: string) {
     status: entry?.status ?? null,
     displayedElapsed,
     start,
-    pause,
-    resume,
     complete,
   };
 }

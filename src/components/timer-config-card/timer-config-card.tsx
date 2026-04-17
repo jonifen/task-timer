@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function TimerConfigCard({ config, onEdit, onDelete }: Props) {
-  const { status, displayedElapsed, start, pause, resume, complete } = useTimer(config.id, config.name);
+  const { status, displayedElapsed, start, complete } = useTimer(config.id, config.name);
   const completedMs = useAppStore((s) =>
     s.timerEntries
       .filter((e) => e.configId === config.id && e.status === "completed")
@@ -20,7 +20,6 @@ export function TimerConfigCard({ config, onEdit, onDelete }: Props) {
 
   const isIdle = status === null;
   const isActive = status === "active";
-  const isPaused = status === "paused";
   const dailyTotal = completedMs + displayedElapsed;
 
   return (
@@ -55,26 +54,6 @@ export function TimerConfigCard({ config, onEdit, onDelete }: Props) {
         )}
 
         {isActive && (
-          <button
-            className={`${styles.timerButton} ${styles.timerButtonSecondary}`}
-            onClick={pause}
-            aria-label={`Pause ${config.name}`}
-          >
-            ⏸ Pause
-          </button>
-        )}
-
-        {isPaused && (
-          <button
-            className={`${styles.timerButton} ${styles.timerButtonStart}`}
-            onClick={resume}
-            aria-label={`Resume ${config.name}`}
-          >
-            ▶ Resume
-          </button>
-        )}
-
-        {!isIdle && (
           <button
             className={`${styles.timerButton} ${styles.timerButtonComplete}`}
             onClick={complete}

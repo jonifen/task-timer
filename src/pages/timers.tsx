@@ -28,7 +28,7 @@ export function TimersPage() {
   // Derive the active/paused quick timer entry directly from the store so it
   // survives a page refresh without needing to persist UI state.
   const quickTimerId = useAppStore(
-    (s) => s.timerEntries.find((e) => !e.configId && (e.status === "active" || e.status === "paused"))?.id ?? null
+    (s) => s.timerEntries.find((e) => !e.configId && e.status === "active")?.id ?? null
   );
 
   const [addingNew, setAddingNew] = useState(false);
@@ -40,7 +40,7 @@ export function TimersPage() {
     navigateToDate(todayStr());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const hasRunningTimers = timerEntries.some((e) => e.status === "active" || e.status === "paused");
+  const hasRunningTimers = timerEntries.some((e) => e.status === "active");
 
   const sortedConfigs = [...timerConfigs].sort((a, b) => (b.lastUsedAt ?? 0) - (a.lastUsedAt ?? 0));
 
