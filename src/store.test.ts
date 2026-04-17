@@ -242,7 +242,8 @@ describe("navigateToDate", () => {
   });
 
   it("migrates legacy paused entries to completed", async () => {
-    const pausedEntry = { id: "1", name: "Test", startedAt: FIXED_NOW - 5000, elapsedMs: 3000, status: "paused", pausedAt: FIXED_NOW - 2000 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pausedEntry = { id: "1", name: "Test", startedAt: FIXED_NOW - 5000, elapsedMs: 3000, status: "paused", pausedAt: FIXED_NOW - 2000 } as any;
     mockDailyHistoryGet.mockResolvedValueOnce({ date: "2026-03-01", entries: [pausedEntry] });
 
     await useAppStore.getState().navigateToDate("2026-03-01");
@@ -253,7 +254,8 @@ describe("navigateToDate", () => {
 
   it("uses pausedAt as completedAt when migrating a paused entry", async () => {
     const pausedAt = FIXED_NOW - 2000;
-    const pausedEntry = { id: "1", name: "Test", startedAt: FIXED_NOW - 5000, elapsedMs: 3000, status: "paused", pausedAt };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pausedEntry = { id: "1", name: "Test", startedAt: FIXED_NOW - 5000, elapsedMs: 3000, status: "paused", pausedAt } as any;
     mockDailyHistoryGet.mockResolvedValueOnce({ date: "2026-03-01", entries: [pausedEntry] });
 
     await useAppStore.getState().navigateToDate("2026-03-01");
@@ -264,7 +266,8 @@ describe("navigateToDate", () => {
 
   it("falls back to startedAt as completedAt when pausedAt is missing on a legacy entry", async () => {
     const startedAt = FIXED_NOW - 5000;
-    const pausedEntry = { id: "1", name: "Test", startedAt, elapsedMs: 3000, status: "paused" };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pausedEntry = { id: "1", name: "Test", startedAt, elapsedMs: 3000, status: "paused" } as any;
     mockDailyHistoryGet.mockResolvedValueOnce({ date: "2026-03-01", entries: [pausedEntry] });
 
     await useAppStore.getState().navigateToDate("2026-03-01");
